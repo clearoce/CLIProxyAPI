@@ -1,10 +1,10 @@
-name: Build FreeBSD Binary
+name: Build for FreeBSD
 
 on:
-  workflow_dispatch: # 允许你在 Actions 页面点击“Run workflow”手动触发
+  workflow_dispatch: 
   push:
     tags:
-      - 'v*' # 当你推送 v 开头的 tag 时自动触发
+      - 'v*'
 
 jobs:
   build:
@@ -16,12 +16,12 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v5
         with:
-          go-version: '1.23' # 使用项目要求的 Go 版本
+          go-version: '1.23' # 建议使用最新的稳定版本
 
       - name: Build for FreeBSD
         run: |
-          # 关键步骤：使用交叉编译指令
-          GOOS=freebsd GOARCH=amd64 go build -ldflags="-s -w" -o CLIProxyAPI-freebsd-amd64 .
+          # 关键点：进入 cmd/server 目录进行编译，并将输出文件移回根目录
+          cd cmd/server && CGO_ENABLED=0 GOOS=freebsd GOARCH=amd64 go build -ldflags="-s -w" -o ../../CLIProxyAPI-freebsd-amd64 .
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
